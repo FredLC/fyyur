@@ -81,5 +81,35 @@
 </section>
 
 <a href="/venues/{{ venue.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
+<button id="deleteBtn" data-id="{{ venue.id }}" onclick="deleteVenue(event)"
+	class="btn btn-danger btn-lg">Delete</button>
+
+<script>
+	const deleteVenue = e => {
+		e = e || window.event;
+		const venue_id = e.target.dataset.id;
+		$.ajax({
+			url: '/venues/' + venue_id + '/delete',
+			type: 'DELETE',
+			success: function (result) {
+				window.location.replace('/');
+			}
+		});
+	}
+	// const deleteBtn = document.getElementById('deleteBtn');
+	// deleteBtn.onclick = (e) => {
+	// 	fetch('/venues/' + e.target.dataset['id'] + '/delete', {
+	// 		method: 'DELETE',
+	// 	})
+	// 		.then(response => {
+	// 			if (!response.ok) {
+	// 				console.log("Error", response);
+	// 			} else {
+	// 				console.log("Success", response);
+	// 				location.reload();
+	// 			}
+	// 		})
+	// }
+</script>
 
 {% endblock %}

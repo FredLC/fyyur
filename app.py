@@ -146,6 +146,7 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
+  error = False
   try:
     name = request.form['name']
     city = request.form['city']
@@ -169,22 +170,41 @@ def create_venue_submission():
     db.session.commit()
   except ():
     db.session.rollback()
+    error = True
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
   finally:
     db.session.close()
+  if error:
+    abort(500)
+  else:
+    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    return render_template('pages/home.html')
 
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  return render_template('pages/home.html')
 
-
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<venue_id>/delete', methods=['DELETE'])
 def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
-
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  error = False
+  venue = Venue.query.get(venue_id)
+  try:
+    db.session.delete(venue)
+    db.session.commit()
+  except:
+    db.session.rollback()
+    error = True
+    flash('An error occurred. Venue could not be deleted.')
+    return 'Failed'
+    # return redirect(url_for('index'))
+  finally:
+    db.session.close()
+  if error:
+    abort(500)
+  else:
+    flash('Venue was successfully deleted!')
+    return 'Success'
+    # return redirect(url_for('index'))
+  
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -233,6 +253,7 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
+  error = False
   artist = Artist.query.get(artist_id)
   try:
     artist.name = request.form['name']
@@ -254,12 +275,15 @@ def edit_artist_submission(artist_id):
     db.session.commit()
   except ():
     db.session.rollback()
+    error = True
     flash('An error occurred. Artist ' + request.form['name'] + ' could not be edited.')
   finally:
     db.session.close()
-
-  flash('Artist ' + request.form['name'] + ' was successfully edited!')
-  return redirect(url_for('show_artist', artist_id=artist_id))
+  if error:
+    abort(500)
+  else:
+    flash('Artist ' + request.form['name'] + ' was successfully edited!')
+    return redirect(url_for('show_artist', artist_id=artist_id))
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
@@ -271,6 +295,7 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
+  error = False
   venue = Venue.query.get(venue_id)
   try:
     venue.name = request.form['name']
@@ -292,12 +317,15 @@ def edit_venue_submission(venue_id):
     db.session.commit()
   except ():
     db.session.rollback()
+    error = True
     flash('An error occurred. Venue ' + request.form['name'] + ' could not be edited.')
   finally:
     db.session.close()
-
-  flash('Venue ' + request.form['name'] + ' was successfully edited!')
-  return redirect(url_for('show_venue', venue_id=venue_id))
+  if error:
+    abort(500)
+  else:
+    flash('Venue ' + request.form['name'] + ' was successfully edited!')
+    return redirect(url_for('show_venue', venue_id=venue_id))
 
 #  Create Artist
 #  ----------------------------------------------------------------
@@ -309,6 +337,7 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
+  error = False
   try:
     name = request.form['name']
     city = request.form['city']
@@ -332,13 +361,15 @@ def create_artist_submission():
     db.session.commit()
   except ():
     db.session.rollback()
+    error = True
     flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
   finally:
     db.session.close()
-
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  return render_template('pages/home.html')
-
+  if error:
+    abort(500)
+  else:
+    flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    return render_template('pages/home.html')
 
 #  Shows
 #  ----------------------------------------------------------------
@@ -368,6 +399,7 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
+  error = False
   try:
     artist_id = request.form['artist_id']
     venue_id = request.form['venue_id']
@@ -379,12 +411,16 @@ def create_show_submission():
     db.session.commit()
   except ():
     db.session.rollback()
+    error = True
     flash('An error occurred. Show could not be listed.')
   finally:
     db.session.close()
+  if error:
+    abort(500)
+  else:
+    flash('Show was successfully listed!')
+    return render_template('pages/home.html')
 
-  flash('Show was successfully listed!')
-  return render_template('pages/home.html')
 
 @app.errorhandler(404)
 def not_found_error(error):
