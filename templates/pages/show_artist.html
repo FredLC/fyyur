@@ -77,5 +77,21 @@
 </section>
 
 <a href="/artists/{{ artist.id }}/edit"><button class="btn btn-primary btn-lg">Edit</button></a>
+<button id="deleteBtn" data-id="{{ artist.id }}" onclick="deleteArtist(event)"
+	class="btn btn-danger btn-lg">Delete</button>
+
+<script>
+	const deleteArtist = e => {
+		e = e || window.event;
+		const artist_id = e.target.dataset.id;
+		$.ajax({
+			url: '/artists/' + artist_id + '/delete',
+			type: 'DELETE',
+			success: function (result) {
+				window.location.replace('/');
+			}
+		});
+	}
+</script>
 
 {% endblock %}
